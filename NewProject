@@ -1,1 +1,55 @@
+#! /bin/bash
 
+#Command-line syntax: NewProject path project_name
+
+if [[ ! -d "$1" && "$2" ]]; then
+	>&2 echo "Your path name is malformed. Type in: NewProject path project_name"
+	exit 1
+elif [[ ! -d "$1" && ! "$2" && "$1" ]]; then
+	project_path="."
+	project_name=$1
+elif [[ ! "$2" || ! "$1" ]]; then
+	>&2 echo "Project name is missing. Type in: NewProject path project_name"
+	exit 1
+else
+	project_path=$1
+	project_name=$2
+fi
+
+if [ "$3" ]; then
+	>&2 echo "Project name must be one word."
+	exit 1
+fi
+
+# End of testing for valid input
+
+# Making the necessary directorys
+cd $project_path
+mkdir $project_name
+mkdir $project_name/docs
+mkdir $project_name/source
+mkdir $project_name/backup
+mkdir $project_name/archive
+cd $project_name
+
+
+# Writing a compile file in the created dir
+echo "#! /bin/bash" >> compile
+echo >> compile
+echo "# Command-line syntax: compile -o executable_name file_name" >> compile
+echo 'if [[ ( "$-" == "-o" && $# -eq 1 ) || $# -eq 0 ]]; then ' >> compile
+echo "	echo \"You are missing file names. Type in: compile -o executable_name file_name(s)\"" >> compile
+echo "	exit 1" >> compile
+echo "fi" >> compile
+echo >> compile
+echo 'for arg in $*; do' >> compile 
+echo '	if [[ "$arg" != "-o" && -f "$arg" ]]; then cp "$arg" backup' >> compile
+echo "	fi" >> compile
+echo "done" >> compile
+echo 'gcc $* 2> errors' >> compile
+echo "more errors" >> compile
+echo "exit" >> compile
+
+chmod 700 compile
+
+exit
