@@ -1,3 +1,3 @@
 # Bash
 
-Small bash script for an undergrad assignemnt.
+Small bash script for an undergrad assignment.
